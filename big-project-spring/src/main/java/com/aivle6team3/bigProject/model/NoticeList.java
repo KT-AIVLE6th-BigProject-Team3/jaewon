@@ -16,13 +16,13 @@ import lombok.*;
 public class NoticeList {
 
     @Id
-    @Column(name = "notice_id", nullable = false)
+    @Column(name = "id", nullable = false)
     private int notice_id;
 
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "created_at", nullable = false)
     private String date;
 
 //    @Column(name = "writer_id", nullable = false)

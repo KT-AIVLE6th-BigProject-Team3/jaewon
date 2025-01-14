@@ -3,12 +3,15 @@ package com.aivle6team3.bigProject.client.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class NoticeListResponse {
-    private int notice_id;
+    private int id;
     private String title;
-    private String date;
-    private String writer_id;
     private String content;
+    private int user_id;
+    private LocalDateTime created_at;
+    private LocalDateTime updated_at;
 }

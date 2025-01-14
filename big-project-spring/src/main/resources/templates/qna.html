@@ -129,9 +129,9 @@
                                     </thead>
                                     <tbody>
                                         <tr th:each="qna, iterStat : ${qnaList}">
-                                            <td th:text="${qna.qna_id}"></td>
+                                            <td th:text="${qna.id}"></td>
                                             <td th:text="${qna.title}"></td>
-                                            <td th:text="${qna.date}"></td>
+                                            <td th:text="${qna.created_at}"></td>
                                             <td>
                                                 <button class="btn btn-success btn-sm reply-btn">답변 완료</button>
                                             </td>

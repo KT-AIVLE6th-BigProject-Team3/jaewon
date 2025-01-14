@@ -122,9 +122,9 @@
                                     </thead>
                                     <tbody>
                                         <tr th:each="notice, iterStat : ${noticeList}">
-                                            <td th:text="${notice.notice_id}"></td>
+                                            <td th:text="${notice.id}"></td>
                                             <td th:text="${notice.title}"></td>
-                                            <td th:text="${notice.date}"}></td>
+                                            <td th:text="${notice.created_at}"}></td>
                                         </tr>
 <!--                                        <tr>-->
 <!--                                            <td>6</td>-->

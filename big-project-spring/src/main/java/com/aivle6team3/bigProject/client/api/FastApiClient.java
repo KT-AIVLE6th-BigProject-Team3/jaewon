@@ -13,9 +13,9 @@ import java.util.List;
 public interface FastApiClient {
 
     // FastAPI 서버에서 처리할 실제 엔드포인트
-    @GetMapping("/board/notice")
-    public List<NoticeListResponse> getNoticeList(@RequestParam("skip") int skip, @RequestParam("limit") int limit);
+    @GetMapping("/board/notice/list")
+    public List<NoticeListResponse> getNoticeList(@RequestParam("page") int page, @RequestParam("limit") int limit);
 
-    @GetMapping("/board/qna")
-    public List<QnaListResponse> getQnaList(@RequestParam("skip") int skip, @RequestParam("limit") int limit);
+    @GetMapping("/board/qna/list")
+    public List<QnaListResponse> getQnaList(@RequestParam("page") int page, @RequestParam("limit") int limit);
 }

@@ -21,10 +21,10 @@ public class BoardController {
 
     // Spring 애플리케이션에서 Spring 서버의 경로
     @GetMapping("/notice")
-    public ModelAndView notice_list(@RequestParam(value = "skip", defaultValue = "0") int skip,
+    public ModelAndView notice_list(@RequestParam(value = "page", defaultValue = "0") int page,
                                     @RequestParam(value = "limit", defaultValue = "10") int limit){
 
-        List<NoticeListResponse> noticeListResponseList = fastApiClient.getNoticeList(skip, limit);
+        List<NoticeListResponse> noticeListResponseList = fastApiClient.getNoticeList(page, limit);
 
         // ModelAndView 객체 생성
         ModelAndView mv = new ModelAndView();
@@ -40,10 +40,10 @@ public class BoardController {
 
     // Spring 애플리케이션에서 Spring 서버의 경로
     @GetMapping("/qna")
-    public ModelAndView qna_list(@RequestParam(value = "skip", defaultValue = "0") int skip,
+    public ModelAndView qna_list(@RequestParam(value = "page", defaultValue = "0") int page,
                                     @RequestParam(value = "limit", defaultValue = "10") int limit){
 
-        List<QnaListResponse> qnaListResponseList = fastApiClient.getQnaList(skip, limit);
+        List<QnaListResponse> qnaListResponseList = fastApiClient.getQnaList(page, limit);
 
         // ModelAndView 객체 생성
         ModelAndView mv = new ModelAndView();
