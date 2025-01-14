@@ -56,14 +56,14 @@
             </li>
 
             <li class="nav-item active">
-                <a class="nav-link" href="predict.html">
+                <a class="nav-link" href="predict">
                     <span class="material-icons">visibility</span>
                     <span>예지보전 예측</span>
                 </a>
             </li>
 
             <li class="nav-item active">
-                <a class="nav-link" href="chat.html">
+                <a class="nav-link" href="chat">
                     <span class="material-icons">sms</span>
                     <span>챗봇</span>
                 </a>
@@ -130,20 +130,19 @@
                                     <tbody>
                                         <tr th:each="qna, iterStat : ${qnaList}">
                                             <td th:text="${qna.id}"></td>
-                                            <td th:text="${qna.title}"></td>
+                                            <td>
+                                                <a th:href="@{/qna/content(id=${qna.id})}" th:text="${qna.title}"></a>
+                                            </td>
                                             <td th:text="${qna.created_at}"></td>
                                             <td>
-                                                <button class="btn btn-success btn-sm reply-btn">답변 완료</button>
+                                                <span th:if="${qna.reply_title}">
+                                                    <button class="btn btn-success btn-sm reply-btn">답변 완료</button>
+                                                </span>
+                                                <span th:if="${qna.reply_title == null}">
+                                                    <button class="btn btn-secondary btn-sm reply-btn">답변 대기중</button>
+                                                </span>
                                             </td>
                                         </tr>
-<!--                                        <tr>-->
-<!--                                            <td>6</td>-->
-<!--                                            <td>여섯 번째 공지사항 제목</td>-->
-<!--                                            <td>2025-01-06</td>-->
-<!--                                            <td>-->
-<!--                                                <button class="btn btn-success btn-sm reply-btn">답변 완료</button>-->
-<!--                                            </td>-->
-<!--                                        </tr>-->
                                     </tbody>
                                 </table>
                             </div>
@@ -181,7 +180,7 @@
 
                 </div>
 
-                <script>
+                <script> <!-- fetch API 를 활용한 AJAX 요청-->
                     const openModal = document.getElementById('openModal');
                     const closeModal = document.getElementById('closeModal');
                     const modal = document.getElementById('qnaModal');
@@ -209,6 +208,7 @@
 
                         console.log('제목:', title);
                         console.log('내용:', content);
+
                         if (attachment) {
                             console.log('첨부파일 이름:', attachment.name);
                         }
@@ -218,8 +218,12 @@
                         alert('질문이 성공적으로 제출되었습니다!');
 
                         modal.classList.remove('active');
+
                     });
                 </script>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

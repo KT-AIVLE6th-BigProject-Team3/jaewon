@@ -1,7 +1,9 @@
 package com.aivle6team3.bigProject.controller;
 
 import com.aivle6team3.bigProject.client.api.FastApiClient;
+import com.aivle6team3.bigProject.client.dto.NoticeContent;
 import com.aivle6team3.bigProject.client.dto.NoticeListResponse;
+import com.aivle6team3.bigProject.client.dto.QnaContent;
 import com.aivle6team3.bigProject.client.dto.QnaListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,18 @@ public class BoardController {
         return mv;
     }
 
+    @GetMapping("/notice/content")
+    public ModelAndView read_notice(@RequestParam(value = "id") int id){
+        // FastAPI 호출로 데이터 가져오기
+        NoticeContent noticeContentResult = fastApiClient.getNoticeContent(id);
+
+        // 데이터를 템플릿에 전달하여 렌더링하기
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("notice_page"); // <- templates/notice_page.html 경로를 가리킴
+        mv.addObject("readNotice", noticeContentResult);
+        return mv;
+    }
+
     // Spring 애플리케이션에서 Spring 서버의 경로
     @GetMapping("/qna")
     public ModelAndView qna_list(@RequestParam(value = "page", defaultValue = "0") int page,
@@ -54,6 +68,17 @@ public class BoardController {
         // 받은 데이터 전달 (qnaList로 설정)
         mv.addObject("qnaList", qnaListResponseList);
 
+        return mv;
+    }
+
+    @GetMapping("/qna/content")
+    public ModelAndView read_qna(@RequestParam(value = "id") int id){
+
+        QnaContent qnaContentResult = fastApiClient.getQnaContent(id);
+
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("qna_page");
+        mv.addObject("readQna", qnaContentResult);
         return mv;
     }
 }

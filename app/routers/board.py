@@ -62,6 +62,25 @@ def edit_question(
     
     return existing
 
+# 게시글 답변
+@router.put("/qna/content/{id}/reply")
+def reply_question(
+    id: int,
+    reply_title: str = Form(...),
+    reply_content: str = Form(...),
+    db: Session = Depends(lambda: SessionLocal())
+):
+    existing = db.query(QnA).filter(QnA.id == id).first() # 기존 content 이름을 existing으로 하여 입력받는 게시글 내용(content)와 이름 중복 방지
+    if not existing:
+        raise HTTPException(status_code=404, detail="QnA content not found")
+    existing.reply_title = reply_title
+    existing.reply_content = reply_content
+        
+    db.commit()
+    db.refresh(existing)
+    
+    return existing
+
 # 게시글 삭제
 @router.delete("/qna/content/{id}/delete")
 def delete_qna(
@@ -105,7 +124,7 @@ def read_notice(
     id: int,
     db: Session = Depends(lambda: SessionLocal())
 ):
-    existing = db.query(QnA).filter(Notice.id == id).first()
+    existing = db.query(Notice).filter(Notice.id == id).first()
     if not existing:
         raise HTTPException(status_code=404, detail="Notice content not found")
     return existing

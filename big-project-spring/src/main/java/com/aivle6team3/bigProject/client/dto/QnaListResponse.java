@@ -14,6 +14,8 @@ public class QnaListResponse {
     public int user_id;        // QnA 작성자 ID
     public LocalDateTime created_at;             // QnA 작성일
     public LocalDateTime updated_at;             // QnA 수정일
-//    public String answer_id;        // 답변자 ID(관리자)
-//    public String answer_content;   // 답변 내용
+    public int reply_user;
+    public String reply_title;
+    public String reply_content;
+//    public LocalDateTime reply_at;
 }
