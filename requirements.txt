@@ -12,3 +12,4 @@ passlib[bcrypt]
 PyJWT
 python-dotenv
 python-jose
+python-decouple
