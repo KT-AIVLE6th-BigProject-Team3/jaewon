@@ -28,11 +28,17 @@
                 
                 <div class="form-row2-container">
                     <div class="form-row2">
-                        <div class="info-label">사번*</div>
-                        <input class="input-field2" id="employee-id" type="text" placeholder="예) 홍길동" required>
-                        <!-- 중복 확인 버튼 -->
-                        <button type="button" onclick="checkEmployeeId()">중복 확인</button>
+                        <!-- (A) 라벨과 버튼을 함께 묶을 컨테이너 -->
+                        <div class="info-label-container" style="display: flex; align-items: center;">
+                            <div class="info-label">사번*</div>
+                            <button type="button" class="check-id-btn" onclick="checkEmployeeId()">중복 확인</button>
+                        </div>
+                        <!-- (B) 사번 입력 필드는 별도 컨테이너 -->
+                        <div class="input-group">
+                            <input class="input-field2" id="employee-id" type="text" placeholder="예) 홍길동" required>
+                        </div>
                     </div>
+                    
                 
                     <div class="form-row2">
                         <div class="info-label">부서*</div>
@@ -103,6 +109,65 @@
         }
     }
 
+    function validateInputs() {
+        const employeeId = document.getElementById('employee-id')?.value.trim();
+        const name = document.getElementById('name')?.value.trim();
+        const phone = document.getElementById('tel')?.value.trim();
+        const email = document.getElementById('email')?.value.trim();
+        const password = document.getElementById('password')?.value;
+        const confirmPassword = document.getElementById('confirm-password')?.value;
+    
+        // 정규식 패턴
+        const employeeIdPattern = /^[a-zA-Z0-9]+$/;         // 알파벳과 숫자만 허용
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // 이메일 형식
+        const phonePattern = /^\d{3}-\d{3,4}-\d{4}$/;       // 010-1234-5678 형식
+    
+        // 1. 이름 필수 입력
+        if (!name) {
+            alert("이름을 입력해주세요.");
+            return false;
+        }
+    
+        // 2. 사번 형식 검증
+        if (!employeeIdPattern.test(employeeId)) {
+            alert("사번은 특수문자나 공백 없이 입력해주세요.");
+            return false;
+        }
+
+        // 3. 사번 중복 체크 여부
+        if (!isEmployeeIdValid) {
+             alert("사번 중복 확인을 해주세요.");
+             return;
+         }
+
+    
+        // 4. 전화번호 형식 검증
+        if (!phonePattern.test(phone)) {
+            alert("전화번호는 '010-1234-5678' 형식으로 입력해주세요.");
+            return false;
+        }
+    
+        // 5. 이메일 형식 검증
+        if (!emailPattern.test(email)) {
+            alert("유효한 이메일 주소를 입력해주세요.");
+            return false;
+        }
+    
+        // 6. 비밀번호 길이 및 확인
+        if (password.length < 8) {
+            alert("비밀번호는 최소 8자 이상이어야 합니다.");
+            return false;
+        }
+
+        // 7. 비밀번호 2차 검증 확인
+        if (password !== confirmPassword) {
+            alert("비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
+            return false;
+        }
+    
+        return true;
+    }
+
     function handleSignUp() {
         const employeeId = document.getElementById('employee-id')?.value;
         const name = document.getElementById('name')?.value;
@@ -112,20 +177,9 @@
         const confirmPassword = document.getElementById('confirm-password')?.value;
         const department = document.getElementById('department')?.value;
 
-        // 1) 비밀번호 일치 여부 체크
-        if (password !== confirmPassword) {
-            alert('비밀번호가 일치하지 않습니다. 다시 확인해주세요.');
+        if(!validateInputs())
             return;
-        }
 
-        // 2) 사번 중복 체크 여부
-        if (!isEmployeeIdValid) {
-           // 사용자가 "중복 확인" 버튼을 누르지 않았거나, 중복된 사번으로 판명된 경우
-            alert("사번 중복 확인을 해주세요.");
-            return;
-        }
-
-        // 3) 서버로 회원가입 요청
         fetch("users/register", {
             method: "POST",
             headers: {
@@ -153,6 +207,7 @@
             alert("회원가입 요청 중 오류가 발생했습니다.");
         });
     }
+
 </script>
 
 </html>

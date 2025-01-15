@@ -30,19 +30,19 @@ def login_user(
         raise HTTPException(status_code=401, detail="아이디 또는 비밀번호가 잘못되었습니다.")
 
     # JWT 생성
-    access_token = create_access_token(data={"sub": user.employee_id})
-
+    access_token = create_access_token(data={"sub": user.employee_id}) 
+ 
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
         secure=False,       # HTTPS 환경이라면 True 권장
-        samesite="strict"   # or 'lax'
+        samesite="strict"   # or 'lax' 
     )
  
     return {"success": True, "message": "로그인 성공"}
 
-def get_current_user_from_cookie(request: Request):
+def get_current_user_from_cookie(request: Request): 
     token = request.cookies.get("access_token")
     if not token:
         raise HTTPException(status_code=403, detail="Not authenticated")

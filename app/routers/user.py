@@ -6,7 +6,7 @@ from app.database import SessionLocal
 from app.models import User
 from app.utils import hash_password
 
-router = APIRouter()
+router = APIRouter() 
 
 @router.post("/register", response_class=HTMLResponse)
 def register_user(
@@ -29,7 +29,7 @@ def register_user(
     new_user = User(
         name=name,
         email=email,
-        password=hashed_pw,
+        password=hashed_pw, 
         department=department,
         employee_id=employee_id,
         phone=phone

@@ -119,6 +119,17 @@ body {
 
 }
 
+.login-container {
+    display: flex;
+    align-items: center;
+}
+
+#error-message {
+    color: red;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
 .signup {
     text-align: center;
     margin-top: 20px;

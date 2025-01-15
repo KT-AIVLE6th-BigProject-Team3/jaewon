@@ -1,29 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="메인페이지">
     <meta name="author" content="">
-
     <title>MonoGuard</title>
 
-    <!--아이콘이랑 폰트가져오기-->
+    <!-- 아이콘이랑 폰트 가져오기 -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-
-    <!--CSS 파일 명시-->
-    <link href="/prj.css" rel="stylesheet">
-
-    <!-- 일반적인 fabicon 설정 -->
-    <link rel="icon" href="/fabicon.svg" />
-
+    <link rel="stylesheet" href="/static/css/prj.css">
+    <link rel="icon" href="/static/img/fabicon.svg" />
 </head>
 
 <body id="page-top">
@@ -33,58 +25,45 @@
 
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
             <!-- Sidebar - Brand -->
-<!--            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">-->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/home">
                 <div class="logo-container">
-                    <img class="logo" src="/logo_white.svg" alt="MonoGuard Logo">
+                    <img class="logo" src="/static/img/logo_white.svg" alt="MonoGuard Logo">
                 </div>
             </a>
-
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-<!--                <a class="nav-link" href="index.html">-->
-                <a class="nav-link" href="index">
+                <a class="nav-link" href="/home">
                     <span class="material-icons sidebor-icon">home </span>
                     <span>홈페이지</span>
                 </a>
             </li>
-
             <li class="nav-item active">
-                <a class="nav-link" href="predict">
+                <a class="nav-link" href="/predict">
                     <span class="material-icons">visibility</span>
                     <span>예지보전 예측</span>
                 </a>
             </li>
-
             <li class="nav-item active">
-                <a class="nav-link" href="chat">
+                <a class="nav-link" href="/chat">
                     <span class="material-icons">sms</span>
                     <span>챗봇</span>
                 </a>
             </li>
-
             <li class="nav-item active">
-<!--                <a class="nav-link" href="notice.html">-->
-                <a class="nav-link" href="notice">
+                <a class="nav-link" href="/notice">
                     <span class="material-icons">info</span>
                     <span>공지사항</span>
-
                 </a>
             </li>
-
             <li class="nav-item active">
-<!--                <a class="nav-link" href="qna.html">-->
-                <a class="nav-link" href="qna">
+                <a class="nav-link" href="/qna">
                     <span class="material-icons sidebor-icon">help_center</span>
                     <span>QnA</span>
                 </a>
             </li>
-
         </ul>
         <!-- 슬라이드바 끝!! -->
 
@@ -105,42 +84,14 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">공지사항</h1>
-
-                    <!-- DataTales Example -->
-                    <div class="card shadow mb-4">
-
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>번호</th>
-                                            <th>제목</th>
-                                            <th>작성일</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="notice, iterStat : ${noticeList}">
-                                            <td th:text="${notice.id}"></td>
-                                            <td>
-                                                <a th:href="@{/notice/content(id=${notice.id})}" th:text="${notice.title}"></a>
-                                            </td>
-                                            <td th:text="${notice.created_at}"}></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                
-                            </div>
-                        </div>
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Chat</h1>
                     </div>
-
                 </div>
-                <!-- /.container-fluid -->
-
             </div>
+
         </div>
-    </div>
+
 </body>
 
 </html>

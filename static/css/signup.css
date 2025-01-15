@@ -87,7 +87,32 @@ body {
     display: flex;
     flex-direction: column; /* 레이블과 입력 필드 수직 정렬 */
     width: 48%; /* 두 요소가 50% 미만으로 나란히 배치되도록 설정 */
+    align-items: center;
+    margin-bottom: 10px;
 }
+
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-left: 10px; /* 사번 글자와 간격 추가 */
+}
+
+.check-id-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.check-id-btn:hover {
+    background-color: #0056b3;
+}
+
 
 .input-field2 {
     width: 100%; /* 입력 필드는 부모 컨테이너에 맞게 확장 */
@@ -152,6 +177,10 @@ body {
     font-weight: 600;
     cursor: default;
     margin-bottom: 0.9rem;
+}
+
+.info-label-container .check-id-btn {
+    margin-left: 15px;
 }
 
 select.input-field2 {

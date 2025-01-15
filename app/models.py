@@ -15,6 +15,17 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now()) # 계정 생성일(자동 기록)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())       # 계정 정보 수정일(자동 기록)
 
+class Notice(Base):
+    __tablename__ = "notice"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    content = Column(String, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    author = relationship("User")
+
 class QnA(Base):
     __tablename__ = "qna"
     id = Column(Integer, primary_key=True, index=True)
@@ -28,16 +39,4 @@ class QnA(Base):
     reply_content = Column(String, nullable=True)
     # reply_at = Column(DateTime(timezone=True))
 
-    author = relationship("User")
-
-# 공지사항(notice) table 추가
-class Notice(Base):
-    __tablename__ = "notice"
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    content = Column(String, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
     author = relationship("User")

@@ -19,7 +19,6 @@
 </head>
 
 <body id="page-top">
-<body onload="fetchHome()">
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -85,45 +84,18 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">공지사항</h1>
-
-                    <!-- DataTales Example -->
-                    <div class="card shadow mb-4">
-
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>번호</th>
-                                            <th>제목</th>
-                                            <th>작성일</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for notice in noticeList %}
-                                        <tr>
-                                            <td>{{ notice.id }}</td>
-                                            <td>
-                                                <a href="/board/notice/content/{{ notice.id }}">
-                                                    {{ notice.title }}
-                                                </a>
-                                            </td>
-                                            <td>{{ notice.created_at }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                                
-                            </div>
-                        </div>
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">예지보전</h1>
                     </div>
-
                 </div>
-                <!-- /.container-fluid -->
-
-
             </div>
+            <script>
+                function moveTopage() {
+                    window.location.href = 'QnA_page.html'; // 이동할 URL
+                }
+            </script>
+
+        </div>
 
 </body>
 
