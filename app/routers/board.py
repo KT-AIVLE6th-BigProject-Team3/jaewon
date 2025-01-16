@@ -4,7 +4,7 @@ from sqlalchemy import desc # 목록 최신순 출력을 위한 내림차순 추
 from app.database import SessionLocal
 from app.models import QnA, Notice
 
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
 
@@ -25,7 +25,7 @@ def create_question(
     new_question = QnA(title=title, content=content, user_id=user_id)
     db.add(new_question)
     db.commit()
-    return {"message": "Question created successfully"}
+    return JSONResponse(content={"message": "Question created successfully"})
 
 # 목록 조회
 @router.get("/qna/list", response_class=HTMLResponse)

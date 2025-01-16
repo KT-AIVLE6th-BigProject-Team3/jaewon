@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse # FileResponse 추가가
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
@@ -34,6 +34,10 @@ def act_notice_page(current_user: dict = Depends(auth.get_current_user_from_cook
     # return templates.TemplateResponse("notice.html", {"request": {}, "user": current_user})
     return RedirectResponse(url="/board/notice/list")
 
+@app.get("/board/notice", response_class=HTMLResponse) # 일단 이렇게 접속할 경우가 있을까 싶지만
+def redirect_notice_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return RedirectResponse(url="/board/notice/list")
+
 @app.get("/notice_detail", response_class=HTMLResponse)
 def act_notice_detail_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
     return templates.TemplateResponse("notice_page.html", {"request": {}, "user": current_user})
@@ -41,6 +45,10 @@ def act_notice_detail_page(current_user: dict = Depends(auth.get_current_user_fr
 @app.get("/qna", response_class=HTMLResponse)
 def act_qna_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
     # return templates.TemplateResponse("QnA.html", {"request": {}, "user": current_user})  
+    return RedirectResponse(url="/board/qna/list")
+
+@app.get("/board/qna", response_class=HTMLResponse) # 설마 이렇게 들어갈까 싶지만 아무튼
+def redirect_qna_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):  
     return RedirectResponse(url="/board/qna/list")
 
 @app.get("/qna_detail", response_class=HTMLResponse)
@@ -54,3 +62,11 @@ def act_predict_page(current_user: dict = Depends(auth.get_current_user_from_coo
 @app.get("/chat", response_class=HTMLResponse)
 def act_chat_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
     return templates.TemplateResponse("chat.html", {"request": {}, "user": current_user})  
+
+@app.get("/sidebar", response_class=FileResponse)
+def get_sidebar():
+    return FileResponse("templates/sidebar.html")
+
+@app.get("/topbar", response_class=FileResponse)
+def get_topbar():
+    return FileResponse("templates/topbar.html")
