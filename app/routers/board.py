@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Form, Depends, HTTPException, Request # HTTPException, Request 추가
+from fastapi import APIRouter, Form, Depends, HTTPException, Request, File, Response, UploadFile # HTTPException, Request, File, Response, UploadFile 추가
 from sqlalchemy.orm import Session
 from sqlalchemy import desc # 목록 최신순 출력을 위한 내림차순 추가
 from app.database import SessionLocal
-from app.models import QnA, Notice
+from app.models import QnA, Notice, QnAFile
 
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
+
+from datetime import datetime # 현재 시간 형태 제대로 바꾸기 위해, ex) 2025-01-16T05:14:04 -> 2025-01-16 05:14:04
+from typing import List
+from urllib.parse import quote # 한글 파일명 인코딩 목적적
 
 router = APIRouter()
 
@@ -16,14 +20,28 @@ templates = Jinja2Templates(directory="templates")
 ## QnA 부분 (기존 =  post(create)만 있었음)
 ################ 게시글 작성
 @router.post("/qna/create")
-def create_question(
+async def create_question(
     title: str = Form(...),
     content: str = Form(...),
-    user_id: int = Form(...),
+    # user_id: int = Form(...),
+    attachment: List[UploadFile] = File(None),
     db: Session = Depends(lambda: SessionLocal())
 ):
-    new_question = QnA(title=title, content=content, user_id=user_id)
+    new_question = QnA(title=title, content=content, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     db.add(new_question)
+    
+    db.flush() # ID 생성 위해 Flush
+    if attachment:
+        for file in attachment:
+            file_content = await file.read()
+            db_file = QnAFile(
+                qna_id=new_question.id,
+                filename=file.filename,
+                content_type=file.content_type,
+                data=file_content
+            )
+            db.add(db_file)
+    
     db.commit()
     return {"message": "게시글이 성공적으로 등록되었습니다."}
 
@@ -40,7 +58,7 @@ def list_question(
         {
             "id" : qna.id,
             "title" : qna.title,
-            "created_at" : qna.created_at.isoformat(),
+            "created_at" : qna.created_at,
             "reply_title" : qna.reply_title # replied or not
         }
         for qna in qnas
@@ -65,15 +83,23 @@ def read_question(
     if not existing:
         raise HTTPException(status_code=404, detail="QnA content not found")
     
+    # QnA 파일 목록 조회
+    files = db.query(QnAFile).filter(QnAFile.qna_id == id).all()
+    file_data = [
+        {"filename": file.filename, "id": file.id} for file in files
+    ]
+    
     qna_content = {
         "id" : existing.id,
         "user_id" : existing.user_id,
         "title" : existing.title,
         "content" : existing.content,
-        "created_at" : existing.created_at.isoformat(),
+        "created_at" : existing.created_at,
         "reply_user" : existing.reply_user,
         "reply_title" : existing.reply_title,
-        "reply_content" : existing.reply_content
+        "reply_content" : existing.reply_content,
+        "reply_at" : existing.reply_at,
+        "files" : file_data
     }
     return templates.TemplateResponse(
         "QnA_page.html",
@@ -82,6 +108,22 @@ def read_question(
             "qna_content" : qna_content
         }
     )
+
+# QnA 첨부파일 다운로드    
+@router.get("/qna/download/{file_id}")
+def download_file(file_id: int, db: Session = Depends(lambda: SessionLocal())):
+    file = db.query(QnAFile).filter(QnAFile.id == file_id).first()
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    filename = quote(file.filename)
+    headers = {
+        "Content-Disposition": f"attachment; filename*=UTF-8''{filename}"
+    }
+    # headers = {
+        # "Content-Disposition": f"attachment; filename={file.filename}"
+    # }
+    return Response(file.data, media_type=file.content_type, headers=headers)
 
 # 게시글 수정
 @router.put("/qna/content/{id}/edit")
@@ -98,6 +140,7 @@ def edit_question(
         existing.title = title
     if content:
         existing.content = content
+    existing.updated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
     db.commit()
     db.refresh(existing)
@@ -117,6 +160,7 @@ def reply_question(
         raise HTTPException(status_code=404, detail="QnA content not found")
     existing.reply_title = reply_title
     existing.reply_content = reply_content
+    existing.reply_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
     db.commit()
     db.refresh(existing)
@@ -146,7 +190,7 @@ def create_notice(
     user_id: int = Form(...),
     db: Session = Depends(lambda: SessionLocal())
 ):
-    new_notice = Notice(title=title, content=content, user_id=user_id)
+    new_notice = Notice(title=title, content=content, user_id=user_id, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     db.add(new_notice)
     db.commit()
     return {"message": "New Notice created successfully"}
@@ -164,7 +208,7 @@ def list_notice(
         {
             "id" : notice.id,
             "title" : notice.title,
-            "created_at" : notice.created_at.isoformat()
+            "created_at" : notice.created_at
         }
         for notice in notices
     ]
@@ -193,7 +237,7 @@ def read_notice(
             "user_id" : existing.user_id,
             "title" : existing.title,
             "content" : existing.content,
-            "created_at" : existing.created_at.isoformat()
+            "created_at" : existing.created_at
     }
     return templates.TemplateResponse(
         "notice_page.html",
@@ -218,6 +262,7 @@ def edit_notice(
         existing.title = title
     if content:
         existing.content = content
+    existing.created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
     db.commit()
     db.refresh(existing)

@@ -23,10 +23,10 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 
     <!--CSS 파일 명시-->
-    <link rel="stylesheet" href="../css/prj.css">
+    <link rel="stylesheet" href="/static/css/prj.css">
 
     <!-- 일반적인 fabicon 설정 -->
-    <link rel="icon" href="../img/fabicon.svg" />
+    <link rel="icon" href="/static/img/fabicon.svg" />
 
 </head>
 
@@ -40,7 +40,7 @@
 
         <script>
             // 메뉴를 동적으로 로드
-            fetch('./admin_sidebar.html')  // 경로 확인
+            fetch('/admin_sidebar')  // 경로 확인
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
@@ -65,7 +65,7 @@
                                 <!-- JavaScript -->
                                 <script>
                                     // 상단바를 동적으로 로드
-                                    fetch('./admin_topbar.html')
+                                    fetch('/admin_topbar')
                                         .then(response => {
                                             if (!response.ok) {
                                                 throw new Error('Network response was not ok ' + response.statusText);

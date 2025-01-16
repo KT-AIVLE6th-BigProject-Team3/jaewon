@@ -70,3 +70,33 @@ def get_sidebar():
 @app.get("/topbar", response_class=FileResponse)
 def get_topbar():
     return FileResponse("templates/topbar.html")
+
+# for admin_page
+
+# sidebar and topbar
+
+@app.get("/admin_sidebar", response_class=FileResponse)
+def get_admin_sidebar():
+    return FileResponse("templates/admin/admin_sidebar.html")
+
+@app.get("/admin_topbar", response_class=FileResponse)
+def get_admin_topbar():
+    return FileResponse("templates/admin/admin_topbar.html")
+
+# page
+
+@app.get("/admin_home", response_class=HTMLResponse)
+def act_admin_main_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return templates.TemplateResponse("admin/admin_index.html", {"request": {}, "user": current_user})
+
+@app.get("/user_management", response_class=HTMLResponse)
+def act_user_management_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return templates.TemplateResponse("admin/user_management.html", {"request": {}, "user": current_user})
+
+@app.get("/notice_management", response_class=HTMLResponse)
+def act_notice_management_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return templates.TemplateResponse("admin/notice_management.html", {"request": {}, "user": current_user})
+
+@app.get("/equipment_management", response_class=HTMLResponse)
+def act_equip_management_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return templates.TemplateResponse("admin/equipment_management.html", {"request": {}, "user": current_user})

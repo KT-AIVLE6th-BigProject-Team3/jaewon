@@ -73,8 +73,22 @@
                         <div class="card-body">
                             <p class="notice">
                                 {{ qna_content.content }}
-                                
-                    </div>
+                        </div>
+                        <!-- 첨부파일 목록-->
+                         {% if qna_content.files %}
+                         <div class="attachments mt-3">
+                            <h5 class="font-weight-bold">첨부 파일</h5>
+                            <ul>
+                                {% for file in qna_content.files %}
+                                <li>
+                                    <a href="/board/qna/download/{{ file.id }}" target="_blank">
+                                        {{ file.filename }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
                     </div>
 
                     <div class="card shadow mb-4">

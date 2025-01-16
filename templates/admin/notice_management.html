@@ -23,10 +23,10 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 
     <!--CSS 파일 명시-->
-    <link rel="stylesheet" href="../css/prj.css">
+    <link rel="stylesheet" href="/static/css/prj.css">
 
     <!-- 일반적인 fabicon 설정 -->
-    <link rel="icon" href="../img/fabicon.svg" />
+    <link rel="icon" href="/static/img/fabicon.svg" />
 
 </head>
 
@@ -40,7 +40,7 @@
 
         <script>
             // 메뉴를 동적으로 로드
-            fetch('./admin_sidebar.html')  // 경로 확인
+            fetch('/admin_sidebar')  // 경로 확인
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
@@ -61,7 +61,7 @@
                 <!-- JavaScript -->
                 <script>
                     // 상단바를 동적으로 로드
-                    fetch('./admin_topbar.html')
+                    fetch('/admin_topbar')
                         .then(response => {
                             if (!response.ok) {
                                 throw new Error('Network response was not ok ' + response.statusText);
@@ -99,21 +99,23 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <!--{% for notice in noticeList %}-->
+                                        <!--<tr>-->
+                                            <!--<td>{% notice.id %}</td>-->
+                                            <!--<td onclick="moveTopage()" class="clickable">{% notice.title%}</td>-->
+                                            <!--<td>{% notice.created_at %}</td>-->
+                                            <!--<td>-->
+                                                <!--<button class="btn btn-fail btn-sm reply-btn">삭제</button>-->
+                                                <!--<button class="btn btn-success btn-sm reply-btn">수정</button>-->
+
+                                            <!--</td>-->
+
+                                        <!--</tr>-->
+                                        <!--{% endfor %}-->
                                         <tr>
                                             <td>7</td>
                                             <td onclick="moveTopage()" class="clickable">일곱 번째 공지사항 제목</td>
                                             <td>2025-01-07</td>
-                                            <td>
-                                                <button class="btn btn-fail btn-sm reply-btn">삭제</button>
-                                                <button class="btn btn-success btn-sm reply-btn">수정</button>
-
-                                            </td>
-
-                                        </tr>
-                                        <tr>
-                                            <td>6</td>
-                                            <td class="clickable">여섯 번째 공지사항 제목</td>
-                                            <td>2025-01-06</td>
                                             <td>
                                                 <button class="btn btn-fail btn-sm reply-btn">삭제</button>
                                                 <button class="btn btn-success btn-sm reply-btn">수정</button>
