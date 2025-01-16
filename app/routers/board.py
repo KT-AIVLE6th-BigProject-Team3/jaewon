@@ -25,7 +25,7 @@ def create_question(
     new_question = QnA(title=title, content=content, user_id=user_id)
     db.add(new_question)
     db.commit()
-    return JSONResponse(content={"message": "Question created successfully"})
+    return {"message": "게시글이 성공적으로 등록되었습니다."}
 
 # 목록 조회
 @router.get("/qna/list", response_class=HTMLResponse)
