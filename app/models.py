@@ -21,12 +21,21 @@ class Notice(Base):
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"))
-    # created_at = Column(DateTime(timezone=True), server_default=func.now())
-    # updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     created_at = Column(String)
     updated_at = Column(String)
+    files = relationship("NoticeFile", back_populates="notice")
     
     author = relationship("User")
+
+class NoticeFile(Base):
+    __tablename__ = "notice_files"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    notice_id = Column(Integer, ForeignKey("notice.id"))
+    filename = Column(String, nullable=False)
+    content_type = Column(String)
+    data = Column(LargeBinary)
+    notice = relationship("Notice", back_populates="files")
 
 class QnA(Base):
     __tablename__ = "qna"
@@ -37,8 +46,6 @@ class QnA(Base):
     created_at = Column(String)
     updated_at = Column(String)
     files = relationship("QnAFile", back_populates="qna")
-    # created_at = Column(DateTime(timezone=True), server_default=func.now())
-    # updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     reply_user = Column(Integer, nullable=True)
     reply_title = Column(String, nullable=True)
     reply_content = Column(String, nullable=True)

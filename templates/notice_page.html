@@ -73,6 +73,21 @@
                                 {{ notice_content.content }}
                             </p>
                         </div>
+                        <!-- 첨부파일 목록-->
+                        {% if notice_content.files %}
+                        <div class="attachments mt-3 card-body">
+                           <h6 class="font-weight-bold d-flex">첨부 파일</h6>
+                           <ul>
+                               {% for file in notice_content.files %}
+                               <li>
+                                   <a href="/board/notice/download/{{ file.id }}" target="_blank">
+                                       {{ file.filename }}
+                                   </a>
+                               </li>
+                               {% endfor %}
+                           </ul>
+                       </div>
+                       {% endif %}
                     </div>
                 </div>
             </div>

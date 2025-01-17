@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends, HTTPException, Request, File, Resp
 from sqlalchemy.orm import Session
 from sqlalchemy import desc # 목록 최신순 출력을 위한 내림차순 추가
 from app.database import SessionLocal
-from app.models import QnA, Notice, QnAFile
+from app.models import QnA, Notice, QnAFile, NoticeFile
 
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.requests import Request
@@ -120,9 +120,6 @@ def download_file(file_id: int, db: Session = Depends(lambda: SessionLocal())):
     headers = {
         "Content-Disposition": f"attachment; filename*=UTF-8''{filename}"
     }
-    # headers = {
-        # "Content-Disposition": f"attachment; filename={file.filename}"
-    # }
     return Response(file.data, media_type=file.content_type, headers=headers)
 
 # 게시글 수정
@@ -184,19 +181,34 @@ def delete_qna(
 
 ##################### 공지사항(Notice)
 @router.post("/notice/create")
-def create_notice(
+async def create_notice(
     title: str = Form(...),
     content: str = Form(...),
-    user_id: int = Form(...),
+    # user_id: int = Form(...),
+    attachment: List[UploadFile] = File(None),
     db: Session = Depends(lambda: SessionLocal())
 ):
-    new_notice = Notice(title=title, content=content, user_id=user_id, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    new_notice = Notice(title=title, content=content, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     db.add(new_notice)
+    
+    db.flush()
+    if attachment:
+        for file in attachment:
+            file_content = await file.read()
+            db_file = NoticeFile(
+                notice_id=new_notice.id,
+                filename=file.filename,
+                content_type=file.content_type,
+                data=file_content
+            )
+            db.add(db_file)
+    
     db.commit()
     return {"message": "New Notice created successfully"}
 
 # 목록 조회
 @router.get("/notice/list", response_class=HTMLResponse)
+@router.get("/notice_management/list", response_class=HTMLResponse)
 def list_notice(
     request: Request,
     page: int = 0, # 목록 페이지 번호
@@ -213,8 +225,16 @@ def list_notice(
         for notice in notices
     ]
     
+    # 요청 URL에 따라 템플릿 파일 동적 선택
+    if request.url.path == "/board/notice/list":
+        template_name = "notice.html"
+    elif request.url.path == "/board/notice_management/list":
+        template_name = "/admin/notice_management.html"
+    else:
+        raise HTTPException(status_code=404, detail="Page not found")
+    
     return templates.TemplateResponse(
-        "notice.html",
+        template_name,
         {
             "request" : request,
             "noticeList" : notice_list
@@ -232,12 +252,18 @@ def read_notice(
     if not existing:
         raise HTTPException(status_code=404, detail="Notice content not found")
     
+    # Notice 첨부파일 목록 조회
+    files = db.query(NoticeFile).filter(NoticeFile.notice_id == id).all()
+    file_data = [
+        {"filename": file.filename, "id": file.id} for file in files
+    ]
     notice_content = {
             "id" : existing.id,
             "user_id" : existing.user_id,
             "title" : existing.title,
             "content" : existing.content,
-            "created_at" : existing.created_at
+            "created_at" : existing.created_at,
+            "files" : file_data
     }
     return templates.TemplateResponse(
         "notice_page.html",
@@ -246,6 +272,20 @@ def read_notice(
             "notice_content" : notice_content
         }
     )
+
+
+# Notice 첨부파일 다운로드
+@router.get("/notice/download/{file_id}")
+def download_notice_file(file_id: int, db: Session = Depends(lambda: SessionLocal())):
+    file = db.query(NoticeFile).filter(NoticeFile.id == file_id).first()
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    filename = quote(file.filename)
+    headers = {
+        "Content-Disposition": f"attachment; filename*=UTF-8''{filename}"
+    }
+    return Response(file.data, media_type=file.content_type, headers=headers)
 
 # 게시글 수정
 @router.put("/notice/content/{id}/edit")
