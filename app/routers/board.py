@@ -10,7 +10,9 @@ from fastapi.templating import Jinja2Templates
 
 from datetime import datetime # 현재 시간 형태 제대로 바꾸기 위해, ex) 2025-01-16T05:14:04 -> 2025-01-16 05:14:04
 from typing import List
-from urllib.parse import quote # 한글 파일명 인코딩 목적적
+from urllib.parse import quote # 한글 파일명 인코딩 목적
+
+from app.routers import auth # 사용자 토큰
 
 router = APIRouter()
 
@@ -23,11 +25,11 @@ templates = Jinja2Templates(directory="templates")
 async def create_question(
     title: str = Form(...),
     content: str = Form(...),
-    # user_id: int = Form(...),
+    user_id: int = Form(...),
     attachment: List[UploadFile] = File(None),
     db: Session = Depends(lambda: SessionLocal())
 ):
-    new_question = QnA(title=title, content=content, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    new_question = QnA(title=title, content=content, user_id=user_id, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     db.add(new_question)
     
     db.flush() # ID 생성 위해 Flush
@@ -51,7 +53,8 @@ def list_question(
     request: Request,
     page: int = 0, # 목록 페이지 번호
     limit: int = 10, # 페이지당 출력할 게시글 수
-    db: Session = Depends(lambda: SessionLocal())
+    db: Session = Depends(lambda: SessionLocal()),
+    current_user: dict = Depends(auth.get_current_user_from_cookie)
 ):
     qnas = db.query(QnA).order_by(desc(QnA.created_at)).offset(page * limit).limit(limit).all()
     qna_list = [
@@ -63,12 +66,13 @@ def list_question(
         }
         for qna in qnas
     ]
-    
+    print(current_user['sub'])
     return templates.TemplateResponse(
         "QnA.html",
         {
             "request" : request,
-            "qnaList" : qna_list
+            "qnaList" : qna_list,
+            "current_user" : current_user['sub']
         }
     )
     

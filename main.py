@@ -44,7 +44,6 @@ def act_notice_detail_page(current_user: dict = Depends(auth.get_current_user_fr
 
 @app.get("/qna", response_class=HTMLResponse)
 def act_qna_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
-    # return templates.TemplateResponse("QnA.html", {"request": {}, "user": current_user})  
     return RedirectResponse(url="/board/qna/list")
 
 @app.get("/board/qna", response_class=HTMLResponse) # 설마 이렇게 들어갈까 싶지만 아무튼
