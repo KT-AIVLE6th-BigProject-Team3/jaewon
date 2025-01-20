@@ -2,14 +2,14 @@ from fastapi import APIRouter, Form, Depends, HTTPException, Request, File, Resp
 from sqlalchemy.orm import Session
 from sqlalchemy import desc # 목록 최신순 출력을 위한 내림차순 추가
 from app.database import SessionLocal
-from app.models import QnA, Notice, QnAFile, NoticeFile
+from app.models import QnA, Notice, QnAFile
 
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
 
 from datetime import datetime # 현재 시간 형태 제대로 바꾸기 위해, ex) 2025-01-16T05:14:04 -> 2025-01-16 05:14:04
-from typing import List
+from typing import List, Optional
 from urllib.parse import quote # 한글 파일명 인코딩 목적
 
 from app.routers import auth # 사용자 토큰
@@ -188,25 +188,19 @@ def delete_qna(
 async def create_notice(
     title: str = Form(...),
     content: str = Form(...),
-    # user_id: int = Form(...),
-    attachment: List[UploadFile] = File(None),
+    user_id: int = Form(...),
+    attachment: UploadFile = File(None),
     db: Session = Depends(lambda: SessionLocal())
 ):
-    new_notice = Notice(title=title, content=content, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    db.add(new_notice)
+    new_notice = Notice(title=title, content=content, user_id=user_id, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
-    db.flush()
     if attachment:
-        for file in attachment:
-            file_content = await file.read()
-            db_file = NoticeFile(
-                notice_id=new_notice.id,
-                filename=file.filename,
-                content_type=file.content_type,
-                data=file_content
-            )
-            db.add(db_file)
+        file_content = await attachment.read()
+        new_notice.attachment_filename = attachment.filename
+        new_notice.attachment_content_type = attachment.content_type
+        new_notice.attachment_data = file_content
     
+    db.add(new_notice)
     db.commit()
     return {"message": "New Notice created successfully"}
 
@@ -257,17 +251,19 @@ def read_notice(
         raise HTTPException(status_code=404, detail="Notice content not found")
     
     # Notice 첨부파일 목록 조회
-    files = db.query(NoticeFile).filter(NoticeFile.notice_id == id).all()
-    file_data = [
-        {"filename": file.filename, "id": file.id} for file in files
-    ]
     notice_content = {
             "id" : existing.id,
             "user_id" : existing.user_id,
             "title" : existing.title,
             "content" : existing.content,
             "created_at" : existing.created_at,
-            "files" : file_data
+            "files" : [
+                {
+                    "filename": existing.attachment_filename,
+                    "content_type": existing.attachment_content_type,
+                    "id": existing.id,
+                }
+            ] if existing.attachment_filename else []
     }
     return templates.TemplateResponse(
         "notice_page.html",
@@ -276,20 +272,6 @@ def read_notice(
             "notice_content" : notice_content
         }
     )
-
-
-# Notice 첨부파일 다운로드
-@router.get("/notice/download/{file_id}")
-def download_notice_file(file_id: int, db: Session = Depends(lambda: SessionLocal())):
-    file = db.query(NoticeFile).filter(NoticeFile.id == file_id).first()
-    if not file:
-        raise HTTPException(status_code=404, detail="File not found")
-    
-    filename = quote(file.filename)
-    headers = {
-        "Content-Disposition": f"attachment; filename*=UTF-8''{filename}"
-    }
-    return Response(file.data, media_type=file.content_type, headers=headers)
 
 # 게시글 수정
 @router.put("/notice/content/{id}/edit")

@@ -23,12 +23,12 @@ class Notice(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(String)
     updated_at = Column(String)
-    files = relationship("NoticeFile", back_populates="notice")
     
     # attatchment file
     attachment_filename = Column(String, nullable=True)
     attachment_content_type = Column(String, nullable=True)
     attachment_data = Column(LargeBinary, nullable=True)
+    
     author = relationship("User")
 
 class QnA(Base):

@@ -102,6 +102,10 @@ def act_user_management_page(current_user: dict = Depends(auth.get_current_user_
 def act_equip_management_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
     return templates.TemplateResponse("admin/equipment_management.html", {"request": {}, "user": current_user})
 
-@app.get("/notice_management", response_class=HTMLResponse)
+@app.get("/notice_management", response_class=RedirectResponse)
+def act_notice_management_redirect(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return RedirectResponse("/board/notice_management/list")
+
+@app.get("/notice_management/list", response_class=HTMLResponse)
 def act_notice_management_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
-    return RedirectResponse(url="/board/notice_management/list")
+    return templates.TemplateResponse("admin/notice_management.html", {"request": {}, "user": current_user['sub']})
