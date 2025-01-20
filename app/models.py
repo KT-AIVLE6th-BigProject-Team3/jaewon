@@ -24,7 +24,7 @@ class Notice(Base):
     created_at = Column(String)
     updated_at = Column(String)
     
-    # attatchment file
+    # attachment file
     attachment_filename = Column(String, nullable=True)
     attachment_content_type = Column(String, nullable=True)
     attachment_data = Column(LargeBinary, nullable=True)
@@ -39,23 +39,19 @@ class QnA(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(String)
     updated_at = Column(String)
-    files = relationship("QnAFile", back_populates="qna")
+    
+    # attachment file
+    attachment_filename = Column(String, nullable=True)
+    attachment_content_type = Column(String, nullable=True)
+    attachment_data = Column(LargeBinary, nullable=True)
+    
+    # reply data
     reply_user = Column(Integer, nullable=True)
     reply_title = Column(String, nullable=True)
     reply_content = Column(String, nullable=True)
     reply_at = Column(String, nullable=True)
 
     author = relationship("User")
-    
-class QnAFile(Base):
-    __tablename__ = "qna_files"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    qna_id = Column(Integer, ForeignKey("qna.id"))
-    filename = Column(String, nullable=False)
-    content_type = Column(String)
-    data = Column(LargeBinary)
-    qna = relationship("QnA", back_populates="files")
     
 class EquipmentData(Base):
     __tablename__ = "equipment_data"

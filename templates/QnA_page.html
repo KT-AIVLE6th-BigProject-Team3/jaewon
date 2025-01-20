@@ -75,17 +75,15 @@
                                 {{ qna_content.content }}
                         </div>
                         <!-- 첨부파일 목록-->
-                         {% if qna_content.files %}
+                         {% if qna_content.filename %}
                          <div class="attachments mt-3 card-body">
                             <h6 class="font-weight-bold d-flex">첨부 파일</h6>
                             <ul>
-                                {% for file in qna_content.files %}
                                 <li>
-                                    <a href="/board/qna/download/{{ file.id }}" target="_blank">
-                                        {{ file.filename }}
+                                    <a href="/board/qna/download/{{ qna_content.id }}" target="_blank">
+                                        {{ qna_content.filename }}
                                     </a>
                                 </li>
-                                {% endfor %}
                             </ul>
                         </div>
                         {% endif %}

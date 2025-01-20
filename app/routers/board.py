@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends, HTTPException, Request, File, Resp
 from sqlalchemy.orm import Session
 from sqlalchemy import desc # 목록 최신순 출력을 위한 내림차순 추가
 from app.database import SessionLocal
-from app.models import QnA, Notice, QnAFile
+from app.models import QnA, Notice
 
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.requests import Request
@@ -25,25 +25,19 @@ templates = Jinja2Templates(directory="templates")
 async def create_question(
     title: str = Form(...),
     content: str = Form(...),
-    user_id: int = Form(...),
-    attachment: List[UploadFile] = File(None),
+    user_id: dict = Depends(auth.get_current_user_from_cookie),
+    attachment: UploadFile = File(None),
     db: Session = Depends(lambda: SessionLocal())
 ):
-    new_question = QnA(title=title, content=content, user_id=user_id, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    db.add(new_question)
+    new_question = QnA(title=title, content=content, user_id=user_id['sub'], created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
-    db.flush() # ID 생성 위해 Flush
     if attachment:
-        for file in attachment:
-            file_content = await file.read()
-            db_file = QnAFile(
-                qna_id=new_question.id,
-                filename=file.filename,
-                content_type=file.content_type,
-                data=file_content
-            )
-            db.add(db_file)
+        file_content = await attachment.read()
+        new_question.attachment_filename = attachment.filename
+        new_question.attachment_content_type = attachment.content_type
+        new_question.attachment_data = file_content
     
+    db.add(new_question)
     db.commit()
     return {"message": "게시글이 성공적으로 등록되었습니다."}
 
@@ -86,13 +80,7 @@ def read_question(
     existing = db.query(QnA).filter(QnA.id == id).first()
     if not existing:
         raise HTTPException(status_code=404, detail="QnA content not found")
-    
-    # QnA 파일 목록 조회
-    files = db.query(QnAFile).filter(QnAFile.qna_id == id).all()
-    file_data = [
-        {"filename": file.filename, "id": file.id} for file in files
-    ]
-    
+   
     qna_content = {
         "id" : existing.id,
         "user_id" : existing.user_id,
@@ -103,7 +91,8 @@ def read_question(
         "reply_title" : existing.reply_title,
         "reply_content" : existing.reply_content,
         "reply_at" : existing.reply_at,
-        "files" : file_data
+        "filename": existing.attachment_filename,
+        "content_type": existing.attachment_content_type,
     }
     return templates.TemplateResponse(
         "QnA_page.html",
@@ -113,18 +102,22 @@ def read_question(
         }
     )
 
+
 # QnA 첨부파일 다운로드    
 @router.get("/qna/download/{file_id}")
-def download_file(file_id: int, db: Session = Depends(lambda: SessionLocal())):
-    file = db.query(QnAFile).filter(QnAFile.id == file_id).first()
-    if not file:
+def download_qna_file(file_id: int, db: Session = Depends(lambda: SessionLocal())):
+    qna = db.query(QnA).filter(QnA.id == file_id).first()
+    if not qna or not qna.attachment_data:
         raise HTTPException(status_code=404, detail="File not found")
 
-    filename = quote(file.filename)
+    filename = quote(qna.attachment_filename)
+    content_type = qna.attachment_content_type
+    file_data = qna.attachment_data
+    
     headers = {
         "Content-Disposition": f"attachment; filename*=UTF-8''{filename}"
     }
-    return Response(file.data, media_type=file.content_type, headers=headers)
+    return Response(content=file_data, media_type=content_type, headers=headers)
 
 # 게시글 수정
 @router.put("/qna/content/{id}/edit")
@@ -152,6 +145,8 @@ def edit_question(
 @router.put("/qna/content/{id}/reply")
 def reply_question(
     id: int,
+    # reply_id: Depends = (auth.get_current_user_from_cookie),
+    reply_id: int = Form(...), # docs test only
     reply_title: str = Form(...),
     reply_content: str = Form(...),
     db: Session = Depends(lambda: SessionLocal())
@@ -159,6 +154,7 @@ def reply_question(
     existing = db.query(QnA).filter(QnA.id == id).first() # 기존 content 이름을 existing으로 하여 입력받는 게시글 내용(content)와 이름 중복 방지
     if not existing:
         raise HTTPException(status_code=404, detail="QnA content not found")
+    existing.reply_user = reply_id
     existing.reply_title = reply_title
     existing.reply_content = reply_content
     existing.reply_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -166,7 +162,12 @@ def reply_question(
     db.commit()
     db.refresh(existing)
     
-    return existing
+    return {
+        "id": existing.id,
+        "reply_user": existing.reply_title,
+        "reply_content": existing.reply_content,
+        "reply_at": existing.reply_at
+    }
 
 # 게시글 삭제
 @router.delete("/qna/content/{id}/delete")
@@ -188,11 +189,12 @@ def delete_qna(
 async def create_notice(
     title: str = Form(...),
     content: str = Form(...),
-    user_id: int = Form(...),
+    user_id: dict = Depends(auth.get_current_user_from_cookie),
     attachment: UploadFile = File(None),
     db: Session = Depends(lambda: SessionLocal())
 ):
-    new_notice = Notice(title=title, content=content, user_id=user_id, created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print("user_id", user_id)
+    new_notice = Notice(title=title, content=content, user_id=user_id['sub'], created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
     if attachment:
         file_content = await attachment.read()
@@ -272,6 +274,23 @@ def read_notice(
             "notice_content" : notice_content
         }
     )
+    
+# 공지사항 첨부파일 다운로드    
+@router.get("/notice/download/{file_id}")
+def download_notice_file(file_id: int, db: Session = Depends(lambda: SessionLocal())):
+    notice = db.query(Notice).filter(Notice.id == file_id).first()
+    if not notice or not notice.attachment_data:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    filename = notice.attachment_filename
+    content_type = notice.attachment_content_type
+    file_data = notice.attachment_data
+    
+    encoded_filename = quote(filename)
+    headers = {
+        "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+    }
+    return Response(content=file_data, media_type=content_type, headers=headers)
 
 # 게시글 수정
 @router.put("/notice/content/{id}/edit")
