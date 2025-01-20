@@ -25,17 +25,11 @@ class Notice(Base):
     updated_at = Column(String)
     files = relationship("NoticeFile", back_populates="notice")
     
+    # attatchment file
+    attachment_filename = Column(String, nullable=True)
+    attachment_content_type = Column(String, nullable=True)
+    attachment_data = Column(LargeBinary, nullable=True)
     author = relationship("User")
-
-class NoticeFile(Base):
-    __tablename__ = "notice_files"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    notice_id = Column(Integer, ForeignKey("notice.id"))
-    filename = Column(String, nullable=False)
-    content_type = Column(String)
-    data = Column(LargeBinary)
-    notice = relationship("Notice", back_populates="files")
 
 class QnA(Base):
     __tablename__ = "qna"
@@ -62,3 +56,30 @@ class QnAFile(Base):
     content_type = Column(String)
     data = Column(LargeBinary)
     qna = relationship("QnA", back_populates="files")
+    
+class EquipmentData(Base):
+    __tablename__ = "equipment_data"
+    
+    device_id = Column(String, primary_key=True, index=True)
+    device_manufacturer = Column(String, nullable=False)
+    device_name = Column(String, nullable=False)
+    installation_environment = Column(String)
+    collection_time = Column(String) # collection date and time
+    cumulative_operationd_day = Column(Integer)
+    equipment_history = Column(Integer)
+    
+    # Sensor data
+    PM10 = Column(Integer, nullable=False)
+    PM2p5 = Column('PM2.5', Integer, nullable=False) # 소수점의 점 자 안되서 python 환경에서 돌릴 땐 2p5, 1p0으로 일단 넣음 
+    PM1p0 = Column('PM1.0', Integer, nullable=False)
+    NTC = Column(Integer, nullable=False)
+    CT1 = Column(Integer, nullable=False)
+    CT2 = Column(Integer, nullable=False)
+    CT3 = Column(Integer, nullable=False)
+    CT4 = Column(Integer, nullable=False)
+    
+    # External Data
+    ex_temperature = Column(Integer, nullable=False)
+    ex_humidity = Column(Integer, nullable=False)
+    ex_illuminance = Column(Integer, nullable=False)
+    

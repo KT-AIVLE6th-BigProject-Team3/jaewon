@@ -62,25 +62,27 @@ def act_predict_page(current_user: dict = Depends(auth.get_current_user_from_coo
 def act_chat_page(current_user: dict = Depends(auth.get_current_user_from_cookie)):
     return templates.TemplateResponse("chat.html", {"request": {}, "user": current_user})  
 
-@app.get("/sidebar", response_class=FileResponse)
-def get_sidebar():
-    return FileResponse("templates/sidebar.html")
+@app.get("/sidebar", response_class=HTMLResponse)
+# def get_sidebar():
+def get_sidebar(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return templates.TemplateResponse("sidebar.html", {"request": {}, "user": current_user})
 
-@app.get("/topbar", response_class=FileResponse)
-def get_topbar():
-    return FileResponse("templates/topbar.html")
+@app.get("/topbar", response_class=HTMLResponse)
+# def get_topbar():
+def get_topbar(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return templates.TemplateResponse("topbar.html", {"request": {}, "user": current_user})
 
 # for admin_page
 
 # sidebar and topbar
 
-@app.get("/admin_sidebar", response_class=FileResponse)
-def get_admin_sidebar():
-    return FileResponse("templates/admin/admin_sidebar.html")
+@app.get("/admin_sidebar", response_class=HTMLResponse)
+def get_admin_sidebar(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return templates.TemplateResponse("admin/admin_sidebar.html", {"request": {}, "user": current_user})
 
-@app.get("/admin_topbar", response_class=FileResponse)
-def get_admin_topbar():
-    return FileResponse("templates/admin/admin_topbar.html")
+@app.get("/admin_topbar", response_class=HTMLResponse)
+def get_admin_topbar(current_user: dict = Depends(auth.get_current_user_from_cookie)):
+    return templates.TemplateResponse("admin/admin_topbar.html", {"request": {}, "user": current_user})
 
 # page
 
