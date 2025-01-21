@@ -16,6 +16,39 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="/static/css/prj.css">
     <link rel="icon" href="/static/img/fabicon.svg" />
+
+    <style>
+        .pagination-container {
+          display: flex;
+          justify-content: center;
+          margin-top: 20px;
+          margin-bottom: 20px;
+        }
+  
+        .pagination {
+          display: flex;
+          gap: 5px;
+        }
+  
+        .pagination button {
+          padding: 8px 12px;
+          border: 1px solid #dee2e6;
+          background-color: #fff;
+          color: #333;
+          cursor: pointer;
+          border-radius: 4px;
+        }
+  
+        .pagination button:hover {
+          background-color: #f8f9fa;
+        }
+  
+        .pagination button.active {
+          background-color: #6c757d;
+          color: white;
+          border-color: #6c757d;
+        }
+      </style>
 </head>
 
 <body id="page-top">
@@ -115,6 +148,27 @@
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- 페이지네이션 추가 -->
+                    <div class="pagination-container">
+                        <div class="pagination">
+                            {% if current_page > 1 %}
+                            <a href="?page={{ current_page - 1}}"><button>&lt;</button></a>
+                            {% endif %}
+                            
+                            {% for p in page_range %}
+                                {% if p == current_page %}
+                                    <button class="active">{{ p }}</button>
+                                {% else %}
+                                    <a href="?page={{ p }}"><button>{{ p }}</button></a>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if current_page < total_pages %}
+                                <a href="?page={{ current_page + 1 }}"><button>&gt;</button></a>
+                            {% endif %}
                         </div>
                     </div>
 

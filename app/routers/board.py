@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, Request, File, Response, UploadFile # HTTPException, Request, File, Response, UploadFile 추가
 from sqlalchemy.orm import Session
-from sqlalchemy import desc # 목록 최신순 출력을 위한 내림차순 추가
+from sqlalchemy import desc, func # 목록 최신순 출력을 위한 내림차순 추가
 from app.database import SessionLocal
 from app.models import QnA, Notice
 
@@ -11,6 +11,7 @@ from fastapi.templating import Jinja2Templates
 from datetime import datetime # 현재 시간 형태 제대로 바꾸기 위해, ex) 2025-01-16T05:14:04 -> 2025-01-16 05:14:04
 from typing import List, Optional
 from urllib.parse import quote # 한글 파일명 인코딩 목적
+from math import ceil # pagination 계산 목적
 
 from app.routers import auth # 사용자 토큰
 
@@ -50,7 +51,18 @@ def list_question(
     db: Session = Depends(lambda: SessionLocal()),
     current_user: dict = Depends(auth.get_current_user_from_cookie)
 ):
-    qnas = db.query(QnA).order_by(desc(QnA.created_at)).offset(page * limit).limit(limit).all()
+    
+    # 전체 게시글 수
+    total_count = db.query(func.count(QnA.id)).scalar()
+    total_pages = ceil(total_count / limit) if total_count else 1
+    if page < 1:
+        page = 1
+    elif page > total_pages:
+        page = total_pages
+        
+    # qnas = db.query(QnA).order_by(desc(QnA.created_at)).offset(page * limit).limit(limit).all()
+    offset_val = (page - 1) * limit
+    qnas = (db.query(QnA).order_by(desc(QnA.created_at)).offset(offset_val).limit(limit).all())
     qna_list = [
         {
             "id" : qna.id,
@@ -60,13 +72,28 @@ def list_question(
         }
         for qna in qnas
     ]
-    print(current_user['sub'])
+    # print(current_user['sub'])
+    
+    start_page = max(1, page - 4)
+    end_page = start_page + 9
+    if end_page > total_pages:
+        end_page = total_pages
+        
+    if (end_page - start_page) < 9:
+        start_page = max(1, end_page - 9)
+        
+    page_range = range(start_page, end_page + 1)
+    
     return templates.TemplateResponse(
         "QnA.html",
         {
             "request" : request,
             "qnaList" : qna_list,
-            "current_user" : current_user['sub']
+            "current_user" : current_user['sub'],
+            "current_page": page,
+            "total_pages": total_pages,
+            "page_range": page_range,
+            "total_count": total_count
         }
     )
     
@@ -215,7 +242,17 @@ def list_notice(
     limit: int = 10, # 페이지당 출력할 게시글 수
     db: Session = Depends(lambda: SessionLocal())
 ):
-    notices = db.query(Notice).order_by(desc(Notice.created_at)).offset(page * limit).limit(limit).all()
+    # 전체 게시글 수
+    total_count = db.query(func.count(Notice.id)).scalar()
+    total_pages = ceil(total_count / limit) if total_count else 1
+    if page < 1:
+        page = 1
+    elif page > total_pages:
+        page = total_pages
+    
+    # notices = db.query(Notice).order_by(desc(Notice.created_at)).offset(page * limit).limit(limit).all() # page 1
+    offset_val = (page - 1) * limit
+    notices = (db.query(Notice).order_by(desc(Notice.created_at)).offset(offset_val).limit(limit).all())
     notice_list = [
         {
             "id" : notice.id,
@@ -233,11 +270,25 @@ def list_notice(
     else:
         raise HTTPException(status_code=404, detail="Page not found")
     
+    start_page = max(1, page - 4)
+    end_page = start_page + 9
+    if end_page > total_pages:
+        end_page = total_pages
+        
+    if (end_page - start_page) < 9:
+        start_page = max(1, end_page - 9)
+        
+    page_range = range(start_page, end_page + 1)
+    
     return templates.TemplateResponse(
         template_name,
         {
             "request" : request,
-            "noticeList" : notice_list
+            "noticeList" : notice_list,
+            "current_page": page,
+            "total_pages": total_pages,
+            "page_range": page_range,
+            "total_count": total_count
         }
     )
 
