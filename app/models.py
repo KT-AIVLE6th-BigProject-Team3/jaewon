@@ -66,8 +66,8 @@ class EquipmentData(Base):
     
     # Sensor data
     PM10 = Column(Integer, nullable=False)
-    PM2p5 = Column('PM2.5', Integer, nullable=False) # 소수점의 점 자 안되서 python 환경에서 돌릴 땐 2p5, 1p0으로 일단 넣음 
-    PM1p0 = Column('PM1.0', Integer, nullable=False)
+    PM2_5 = Column('PM2_5', Integer, nullable=False) # 소수점의 점 자 안되서 python 환경에서 돌릴 땐 2_5, 1_0 
+    PM1_0 = Column('PM1_0', Integer, nullable=False)
     NTC = Column(Integer, nullable=False)
     CT1 = Column(Integer, nullable=False)
     CT2 = Column(Integer, nullable=False)
@@ -79,3 +79,41 @@ class EquipmentData(Base):
     ex_humidity = Column(Integer, nullable=False)
     ex_illuminance = Column(Integer, nullable=False)
     
+    
+#     CREATE DATABASE IF NOT EXISTS sensor_data;
+# CREATE TABLE agv_data (
+#     device_id VARCHAR(10),
+#     collection_date DATE,
+#     collection_time TIME,
+#     cumulative_operating_day TINYINT,
+#     filenames TEXT,
+#     NTC FLOAT,
+#     PM1_0 FLOAT,
+#     PM2_5 FLOAT,
+#     PM10 FLOAT,
+#     CT1 FLOAT,
+#     CT2 FLOAT,
+#     CT3 FLOAT,
+#     CT4 FLOAT,
+#     ex_temperature FLOAT,
+#     ex_humidity FLOAT,
+#     ex_illuminance FLOAT
+# );
+# CREATE TABLE oht_data (
+#     device_id VARCHAR(10),
+#     collection_date DATE,
+#     collection_time TIME,
+#     cumulative_operating_day TINYINT,
+#     filenames TEXT,
+#     NTC FLOAT,
+#     PM1_0 FLOAT,
+#     PM2_5 FLOAT,
+#     PM10 FLOAT,
+#     CT1 FLOAT,
+#     CT2 FLOAT,
+#     CT3 FLOAT,
+#     CT4 FLOAT,
+#     ex_temperature FLOAT,
+#     ex_humidity FLOAT,
+#     ex_illuminance FLOAT
+# );
