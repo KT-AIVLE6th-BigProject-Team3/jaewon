@@ -45,7 +45,7 @@ class QnA(Base):
     attachment_content_type = Column(String, nullable=True)
     attachment_data = Column(LargeBinary, nullable=True)
     
-    # reply data
+    # reply information
     reply_user = Column(Integer, nullable=True)
     reply_title = Column(String, nullable=True)
     reply_content = Column(String, nullable=True)

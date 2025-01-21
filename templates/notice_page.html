@@ -95,12 +95,20 @@
                 <div class="notice-nav-item">
                     <span class="nav-arrow">∧</span>
                     <span class="nav-label">다음글</span>
-                    <a href="#" class="nav-title">다음글</a>
+                    {% if next_notice %}
+                    <a href="/board/notice/content/{{ next_notice.id }}" class="nav-title">{{ next_notice.title }}</a>
+                    {% else %}
+                    <span class="nav-title text-mutad">마지막 글입니다.</span>
+                    {% endif %}
                 </div>
                 <div class="notice-nav-item">
                     <span class="nav-arrow">∨</span>
                     <span class="nav-label">이전글</span>
-                    <a href="#" class="nav-title">이전글</a>
+                    {% if prev_notice %}
+                    <a href="/board/notice/content/{{ prev_notice.id }}" class="nav-title">{{ prev_notice.title }}</a>
+                    {% else %}
+                    <span class="nav-title text-mutad">첫 번째 글입니다.</span>
+                    {% endif %}
                 </div>
             </div>
             <script>

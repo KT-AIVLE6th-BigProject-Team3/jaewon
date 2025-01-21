@@ -252,6 +252,11 @@ def read_notice(
     if not existing:
         raise HTTPException(status_code=404, detail="Notice content not found")
     
+    # 이전글 정보 조회
+    prev_notice = (db.query(Notice).filter(Notice.id < existing.id).order_by(Notice.id.desc()).first())
+    # 다음글 정보 조회
+    next_notice = (db.query(Notice).filter(Notice.id > existing.id).order_by(Notice.id.asc()).first())
+    
     # Notice 첨부파일 목록 조회
     notice_content = {
             "id" : existing.id,
@@ -267,11 +272,20 @@ def read_notice(
                 }
             ] if existing.attachment_filename else []
     }
+    
     return templates.TemplateResponse(
         "notice_page.html",
         {
             "request" : request,
-            "notice_content" : notice_content
+            "notice_content" : notice_content,
+            "prev_notice" : {
+                "id": prev_notice.id,
+                "title": prev_notice.title
+            } if prev_notice else None,
+            "next_notice":{
+                "id": next_notice.id,
+                "title": next_notice.title
+            } if next_notice else None
         }
     )
     
